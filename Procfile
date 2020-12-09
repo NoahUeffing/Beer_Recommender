@@ -1,1 +1,1 @@
-web: gunicorn app:nslcRecommender
+web: gunicorn nslcRecommender:app
