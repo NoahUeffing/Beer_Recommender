@@ -31,43 +31,47 @@ def create_soup(x):
 # Gives beer reccomendations
 
 
-def get_recommendations(name, cosine_sim, indices, beers2):
-    results = []
-    # Get the index of the beer that matches the name
-    idx = indices[name]
+def get_recommendations(name, cosine_sim, indices, dataFrame):
+    if (dataFrame['Name'] == name).any():
+        results = []
+        # Get the index of the beer that matches the name
+        idx = indices[name]
 
-    # Get the pairwsie similarity scores of all beers with input beer
-    sim_scores = list(enumerate(cosine_sim[idx]))
+        # Get the pairwsie similarity scores of all beers with input beer
+        sim_scores = list(enumerate(cosine_sim[idx]))
 
-    # Sort the beers based on the similarity scores
-    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+        # Sort the beers based on the similarity scores
+        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
 
-    # Get the scores of the 10 most similar beers
-    sim_scores = sim_scores[1:11]
+        # Get the scores of the 10 most similar beers
+        sim_scores = sim_scores[1:11]
 
-    # Get the beer indices
-    beer_indices = [i[0] for i in sim_scores]
+        # Get the beer indices
+        beer_indices = [i[0] for i in sim_scores]
 
-    recommendations = beers2['Name'].iloc[beer_indices] + \
-        "?" + beers2['Category'].iloc[beer_indices] + "?" + beers2['Style'].iloc[beer_indices] + \
-        "?" + beers2['IBU'].iloc[beer_indices] + "?" + beers2['ABV'].iloc[beer_indices] + \
-        "?" + beers2['Brewery'].iloc[beer_indices] + "?" + beers2['Province'].iloc[beer_indices] + \
-        "?" + beers2['Country'].iloc[beer_indices] + "?" + beers2['Taste_Profile'].iloc[beer_indices] + \
-        "?" + beers2['Food_Pairing'].iloc[beer_indices] + "?" + beers2['Flavours'].iloc[beer_indices] + \
-        "?" + beers2['Link'].iloc[beer_indices]
+        recommendations = dataFrame['Name'].iloc[beer_indices] + \
+            "?" + dataFrame['Category'].iloc[beer_indices] + "?" + dataFrame['Style'].iloc[beer_indices] + \
+            "?" + dataFrame['IBU'].iloc[beer_indices] + "?" + dataFrame['ABV'].iloc[beer_indices] + \
+            "?" + dataFrame['Brewery'].iloc[beer_indices] + "?" + dataFrame['Province'].iloc[beer_indices] + \
+            "?" + dataFrame['Country'].iloc[beer_indices] + "?" + dataFrame['Taste_Profile'].iloc[beer_indices] + \
+            "?" + dataFrame['Food_Pairing'].iloc[beer_indices] + "?" + dataFrame['Flavours'].iloc[beer_indices] + \
+            "?" + dataFrame['Link'].iloc[beer_indices]
 
-    for val in recommendations:
-        entry = val.split("?")
-        results.append(
-            "<li><b><i>" + entry[0] + "</i></b><a href=" + entry[11] + "> Link</a>" + "<ul><li> <b>Category</b>: " +
-            entry[1] + "</li> <li><b>Style</b>: " + entry[2] + "</li><li> <b>IBU</b>: " + entry[3] +
-            "</li><li> <b>ABV</b>: " + entry[4] + "</li><li> <b>Brewery</b>: " + entry[5] +
-            "</li><li> <b>Province</b>: " + entry[6] + "</li><li> <b>Country</b>: " + entry[7] +
-            "</li><li> <b>Taste Profile</b>:  " + entry[8] + "</li><li> <b>Food Pairing</b>: " + entry[9] +
-            "</li><li> <b>Flavours</b>: " + entry[10] + "</li></ul></li>")
+        for val in recommendations:
+            entry = val.split("?")
+            results.append(
+                "<li><b><i>" + entry[0] + "</i></b><a href=" + entry[11] + "> Link</a>" + "<ul><li> <b>Category</b>: " +
+                entry[1] + "</li> <li><b>Style</b>: " + entry[2] + "</li><li> <b>IBU</b>: " + entry[3] +
+                "</li><li> <b>ABV</b>: " + entry[4] + "</li><li> <b>Brewery</b>: " + entry[5] +
+                "</li><li> <b>Province</b>: " + entry[6] + "</li><li> <b>Country</b>: " + entry[7] +
+                "</li><li> <b>Taste Profile</b>:  " + entry[8] + "</li><li> <b>Food Pairing</b>: " + entry[9] +
+                "</li><li> <b>Flavours</b>: " + entry[10] + "</li></ul></li><br>")
 
-    # Return the top 10 most similar beers
-    return "".join(results)
+        # Return the top 10 most similar beers
+        return "".join(results)
+    else:
+        return "No beer named '" + name + "' found in the database. Try copy and pasting a name from the 'Name'" + \
+            " column into the recommender."
 
 
 app = Flask(__name__)
