@@ -9,7 +9,7 @@ To install and run the dev environment:
 
 - To install dependencies, navigate to main folder "Beer_Recommender" in either command prompt or terminal window and enter "pip install -r requirements.txt".
 
-- To launch the app, using a terminal or comannd prompt, navigate to the directory containing all project files(Beer_Recommender) and enter "python nslcRecommender.py". This should launch the app and open a browser window to access the site.
+- To launch the app, using a terminal or comannd prompt, navigate to the directory containing all project files(Beer_Recommender) and enter "python nslcRecommender.py". This should run the app at localhost:5000 and be viewable in your web browser.
 
 createBeerDatabase.py can be run to generate a new NSLC_Beers.db file from beers.csv if the database needs to be updated or recreated.
 If you plan on doing this, make sure to delete your NSLC_Beers.db file if it exists before running createBeerDatabase.py.
