@@ -4,8 +4,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 import sqlite3
 
+
 # Used to convert each string in beers table to standard format for comparison
-# Convert all strings to lower case and strip names of spaces
+# Strip all spaces and convert to lowercase
 def clean_data(x):
     if isinstance(x, str):
         return str.lower(x.replace(" ", ""))
