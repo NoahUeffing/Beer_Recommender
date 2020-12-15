@@ -4,16 +4,15 @@ from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 import sqlite3
 
-# Function to convert all strings to lower case and strip names of spaces
-
-
+# Used to convert each string in beers table to standard format for comparison
+# Convert all strings to lower case and strip names of spaces
 def clean_data(x):
     if isinstance(x, str):
         return str.lower(x.replace(" ", ""))
     else:
         return ''
 
-
+# Used to allow each entry in beers2 table to be printed for html output
 def clean_string(x):
     if isinstance(x, str):
         return str(x)
@@ -21,17 +20,15 @@ def clean_string(x):
         return ''
 
 # Creates word soup for similairty comparision
-
-
 def create_soup(x):
     return x['Category'] + ' ' + x['Style'] + ' ' + x['ABV'] + ' ' + x['Brewery'] + \
         ' ' + x['Taste_Profile'] + ' ' + x['Country'] + ' ' + x['Food_Pairing'] + ' ' + \
         x['Flavours'] + ' ' + x['IBU'] + ' ' + x['Province']
 
-# Gives beer reccomendations
-
-
+# Gives beer reccomendations for a given beer name, using an input cosine similarity measure and indicies,
+# as well as dataframe for stylized output
 def get_recommendations(name, cosine_sim, indices, dataFrame):
+    # Find liked beer in the dataframe
     if (dataFrame['Name'] == name).any():
         results = []
         # Get the index of the beer that matches the name
@@ -49,6 +46,7 @@ def get_recommendations(name, cosine_sim, indices, dataFrame):
         # Get the beer indices
         beer_indices = [i[0] for i in sim_scores]
 
+        # Gather each beer and it's attributes for out
         recommendations = dataFrame['Name'].iloc[beer_indices] + \
             "?" + dataFrame['Category'].iloc[beer_indices] + "?" + dataFrame['Style'].iloc[beer_indices] + \
             "?" + dataFrame['IBU'].iloc[beer_indices] + "?" + dataFrame['ABV'].iloc[beer_indices] + \
@@ -57,6 +55,7 @@ def get_recommendations(name, cosine_sim, indices, dataFrame):
             "?" + dataFrame['Food_Pairing'].iloc[beer_indices] + "?" + dataFrame['Flavours'].iloc[beer_indices] + \
             "?" + dataFrame['Link'].iloc[beer_indices]
 
+        # Format the each recommended beer's attribbutes into an html list
         for val in recommendations:
             entry = val.split("?")
             results.append(
@@ -67,8 +66,10 @@ def get_recommendations(name, cosine_sim, indices, dataFrame):
                 "</li><li> <b>Taste Profile</b>:  " + entry[8] + "</li><li> <b>Food Pairing</b>: " + entry[9] +
                 "</li><li> <b>Flavours</b>: " + entry[10] + "</li></ul></li><br>")
 
-        # Return the top 10 most similar beers
+        # Return the top 10 most similar beers as an html table
         return "".join(results)
+
+    # If liked beer is not in the dataframe
     else:
         return "No beer named '" + name + "' found in the database. Try copy and pasting a name from the 'Name'" + \
             " column into the recommender."
@@ -76,8 +77,9 @@ def get_recommendations(name, cosine_sim, indices, dataFrame):
 
 app = Flask(__name__)
 
-
+# Homepage
 @app.route('/')
+# Format all beers in db to an html table
 def home():
     conn = sqlite3.connect('NSLC_Beers.db')
 
@@ -93,6 +95,7 @@ def home():
     return HOME_HTML.format(beerList)
 
 
+# html code for home page
 HOME_HTML = """
     <html>
     <body>
@@ -104,10 +107,13 @@ HOME_HTML = """
         {0}
     </body></html>"""
 
-
+# Recommendations page
 @app.route('/recommend')
+# Generate the recommendations for output as an html list
 def recommend():
+    # gets liked beer from homepage form input
     likedBeer = request.args.get('likedBeer', '')
+    # Check if liked beer was entered before button was pushed
     if likedBeer == '':
         msg = 'No beer was entered.'
     else:
@@ -115,10 +121,11 @@ def recommend():
 
     conn = sqlite3.connect('NSLC_Beers.db')
 
+    # dataframe used to get recommendations
     beers = pd.read_sql('''  
     SELECT * FROM NSLC_BEERS
             ''', conn)
-
+    # dataframe used to output formated recommendations (maintain case, spacing, and stop words)
     beers2 = pd.read_sql('''  
     SELECT * FROM NSLC_BEERS
             ''', conn)
@@ -126,6 +133,7 @@ def recommend():
     descriptors = ['Category', 'Style', 'ABV', 'Brewery',
                    'Taste_Profile', 'Country', 'Food_Pairing', 'Flavours', 'IBU', 'Province']
 
+    # Format the dataframes for their intended useage
     for descriptor in descriptors:
         beers[descriptor] = beers[descriptor].apply(clean_data)
         beers2[descriptor] = beers2[descriptor].apply(clean_string)
@@ -140,10 +148,11 @@ def recommend():
     # Reset index of main DataFrame and construct reverse mapping
     beers = beers.reset_index()
     indices = pd.Series(beers.index, index=beers['Name'])
-
+    # Return the recommendations in html form
     return RECOMMEND_HTML.format(msg, get_recommendations(likedBeer, cosine_sim2, indices, beers2))
 
 
+# html for recommendations page
 RECOMMEND_HTML = """
     <html><body>
         <h2>{0}</h2>
