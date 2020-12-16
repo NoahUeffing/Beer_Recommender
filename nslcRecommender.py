@@ -14,6 +14,8 @@ def clean_data(x):
         return ''
 
 # Used to allow each entry in beers2 table to be printed for html output
+
+
 def clean_string(x):
     if isinstance(x, str):
         return str(x)
@@ -21,6 +23,8 @@ def clean_string(x):
         return ''
 
 # Creates word soup for similairty comparision
+
+
 def create_soup(x):
     return x['Category'] + ' ' + x['Style'] + ' ' + x['ABV'] + ' ' + x['Brewery'] + \
         ' ' + x['Taste_Profile'] + ' ' + x['Country'] + ' ' + x['Food_Pairing'] + ' ' + \
@@ -28,6 +32,8 @@ def create_soup(x):
 
 # Gives beer reccomendations for a given beer name, using an input cosine similarity measure and indicies,
 # as well as dataframe for stylized output
+
+
 def get_recommendations(name, cosine_sim, indices, dataFrame):
     # Find liked beer in the dataframe
     if (dataFrame['Name'] == name).any():
@@ -79,6 +85,8 @@ def get_recommendations(name, cosine_sim, indices, dataFrame):
 app = Flask(__name__)
 
 # Homepage
+
+
 @app.route('/')
 # Format all beers in db to an html table
 def home():
@@ -99,6 +107,13 @@ def home():
 # html code for home page
 HOME_HTML = """
     <html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="icon" href="https://image.flaticon.com/icons/png/128/2884/2884841.png">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="NSLC beer recommender">
+        <title> Beer Recommender </title>
+    </head>
     <body>
         <h2>NSLC Beer Recommender</h2>
         <form action="/recommend">
@@ -109,6 +124,8 @@ HOME_HTML = """
     </body></html>"""
 
 # Recommendations page
+
+
 @app.route('/recommend')
 # Generate the recommendations for output as an html list
 def recommend():
@@ -155,7 +172,15 @@ def recommend():
 
 # html for recommendations page
 RECOMMEND_HTML = """
-    <html><body>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="icon" href="https://image.flaticon.com/icons/png/128/2884/2884841.png">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="NSLC beer recommendations">
+        <title> Beer Recommendations </title>
+    </head>
+    <body>
         <h2>{0}</h2>
         <a href="/">Back to Recommender</a>
         <ol>
